@@ -22,10 +22,12 @@ class MainActivity : AppCompatActivity() {
     // Add face detector model dependency
     // Auto-download ML model (in Manifest)
 
-    // Detect Images without camera (use logs)
+    // Detect Images without a camera (use logs)
     // Import image to drawables
     // Detect face
     // Draw
+
+    // You can attach camera to face detector the same way we did in different tutorial: https://simpledataflow.com/dataflow-tutorial-build-not-hotdog-android-app-from-silicon-valley-tv-series-with-machine-learning/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         val bitmap = BitmapFactory.decodeResource(
             this.applicationContext.resources,
-            R.drawable.face // make sure the image is not big
+            R.drawable.face// make sure the image is not big
         )
 
         val image = FirebaseVisionImage.fromBitmap(bitmap)
