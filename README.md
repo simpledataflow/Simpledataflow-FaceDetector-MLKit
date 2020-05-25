@@ -7,5 +7,4 @@
 
 In the tutorial, In this tutorial, we will create an android application that will recognize a human face and its contours.
 
-
-![Alt Text](readmeRes/image.png)
+![Alt Text](readmeImages/image.png)
