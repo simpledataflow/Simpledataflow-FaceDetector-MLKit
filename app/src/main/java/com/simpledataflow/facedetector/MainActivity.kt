@@ -18,11 +18,11 @@ class MainActivity : AppCompatActivity() {
     // Dataflow tutorial
 
     // Connect to Firebase with Assistant (create a firebase project) -> check Firebase console
-    // Connect to MLKit
+    // Connect to MLKit + manually add dependecies to gradle
     // Add face detector model dependency
     // Auto-download ML model (in Manifest)
 
-    // Detect Images without a camera (use logs)
+    // Detect Images
     // Import image to drawables
     // Detect face
     // Draw
@@ -37,11 +37,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun detectFace() {
-        val options = FirebaseVisionFaceDetectorOptions.Builder()
-            .setPerformanceMode(FirebaseVisionFaceDetectorOptions.FAST)
-            .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
-            .build()
-
+        // create a Bitmap object (programmatic representation of an image) from a drawable
         val bitmap = BitmapFactory.decodeResource(
             this.applicationContext.resources,
             R.drawable.face// make sure the image is not big
@@ -49,11 +45,20 @@ class MainActivity : AppCompatActivity() {
 
         val image = FirebaseVisionImage.fromBitmap(bitmap)
 
+        // if you use an android camera and detecting faces continuously then don't create options object every time
+        // create an options objects, which specifies that we need faster analysis of an image and we want to detect all countours of the face
+        val options = FirebaseVisionFaceDetectorOptions.Builder()
+            .setPerformanceMode(FirebaseVisionFaceDetectorOptions.FAST)
+            .setContourMode(FirebaseVisionFaceDetectorOptions.ALL_CONTOURS)
+            .build()
+
+        // create a detector object to analyze the image
         val detector = FirebaseVision.getInstance()
             .getVisionFaceDetector(options)
 
         // detecting image will take a while (only for this project) because images itself were artificial.
         // if you use android camera it will fast real time
+        // analyze the image
         detector.detectInImage(image)
             .addOnSuccessListener { faces ->
                 // Task completed successfully
@@ -70,14 +75,22 @@ class MainActivity : AppCompatActivity() {
         face: FirebaseVisionFace,
         myBitmap: Bitmap
     ) {
-        //Create a new image bitmap and attach a brand new canvas to it
+        // We need to do 4 things:
+        // - create a canvas so we can draw on it
+        // - draw original image on the canvas
+        // - draw contours on the canvas
+        // - set canvas on the ImageView in the UI as a drawable
+
+        // 1. create a canvas
         val tempBitmap =
             Bitmap.createBitmap(myBitmap.width, myBitmap.height, Bitmap.Config.RGB_565)
         val canvas = Canvas(tempBitmap)
 
+        // 2. draw original image on the canvas
         canvas.drawBitmap(myBitmap, 0f, 0f, null)
 
-        // init (if you use an android camera and detecting faces continuously then don't create Paint objects every time)
+        // 3. draw contours on the canvas
+        // 3.1. create colors and stokes for drawing
         val selectedColor = Color.RED
         val facePositionPaint = Paint()
         facePositionPaint.color = selectedColor
@@ -87,11 +100,11 @@ class MainActivity : AppCompatActivity() {
         boxPaint.style = Paint.Style.STROKE
         boxPaint.strokeWidth = BOX_STROKE_WIDTH
 
-        // Draws a circle at the position of the detected face, with the face's track id below.
+        // 3.2. Get center x and y coordinates of the face
         val x = face.boundingBox.centerX().toFloat()
         val y = face.boundingBox.centerY().toFloat()
 
-        // Draws a bounding box around the face.
+        // 3.3. Draws a bounding box around the face.
         val xOffset = face.boundingBox.width() / 2.0f
         val yOffset = face.boundingBox.height() / 2.0f
         val left = x - xOffset
@@ -100,6 +113,7 @@ class MainActivity : AppCompatActivity() {
         val bottom = y + yOffset
         canvas.drawRect(left, top, right, bottom, boxPaint)
 
+        // 3.4. Draws contours
         val contour = face.getContour(FirebaseVisionFaceContour.ALL_POINTS)
         for (point in contour.points) {
             val px = point.x
@@ -107,7 +121,7 @@ class MainActivity : AppCompatActivity() {
             canvas.drawCircle(px, py, FACE_POSITION_RADIUS, facePositionPaint)
         }
 
-        //Attach the canvas to the ImageView
+        // 4. set canvas on the ImageView in the UI
         iv_face.setImageDrawable(BitmapDrawable(resources, tempBitmap))
     }
 
