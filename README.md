@@ -3,7 +3,7 @@
 
 ### Text tutorial: https://simpledataflow.com/build-face-detector-android-app-with-machine-learning-mlkit-dataflow-tutorial/
 
-### Video tutorials: check my youtube channel
+### Video tutorials:  https://youtu.be/jP1RvP3TtN4
 
 In the tutorial, In this tutorial, we will create an android application that will recognize a human face and its contours.
 
